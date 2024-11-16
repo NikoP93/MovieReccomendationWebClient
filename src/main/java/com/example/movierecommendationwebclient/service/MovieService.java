@@ -2,6 +2,7 @@ package com.example.movierecommendationwebclient.service;
 
 
 
+import com.example.movierecommendationwebclient.dtos.MovieResponse;
 import com.example.movierecommendationwebclient.model.Movie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,6 @@ public class MovieService {
 
     private final WebClient webClient;
 
-    private static final Logger logger = LoggerFactory.getLogger(MovieService.class);
 
     public MovieService() {
         this.webClient = WebClient.create();
@@ -51,14 +51,12 @@ public class MovieService {
     }
 
     public Mono<List<Movie>> fetchMoviesByGenre(int genreId) throws URISyntaxException {
-        Mono<List<Movie>> movieList = webClient
+        return webClient
                 .get()
                 .uri(new URI(url + "/discover/movie?api_key=" + apiKey + "&with_genres=" + genreId))
-                .accept(MediaType.APPLICATION_JSON,MediaType.APPLICATION_XML)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<Movie>>() {});
-
-        return movieList;
-
+                .bodyToMono(MovieResponse.class) // Map to MovieResponse
+                .map(MovieResponse::getMovies); // Extract movies from the "results" field
     }
+
 }
