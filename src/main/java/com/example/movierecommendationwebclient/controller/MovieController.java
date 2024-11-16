@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+import java.net.URISyntaxException;
 import java.util.Map;
 
 @RestController
@@ -28,15 +29,19 @@ public class MovieController {
         }
 
         @GetMapping("/recommendation")
-        public Mono<MyResponse> getMovieRecommendation(@RequestParam String genreName) {
+        public Mono<MyResponse> getMovieRecommendation(@RequestParam String genreName) throws URISyntaxException {
             return movieService.fetchGenres()
                     .flatMap(genres -> {
                         Integer genreId = genres.get(genreName);
                         if (genreId == null) {
                             return Mono.just(new MyResponse("Invalid genre name: " + genreName));
                         }
-                        return movieService.fetchMoviesByGenre(genreId)
-                                .flatMap(movies -> openAIService.fetchMovieRecommendation(genreName, movies));
+                        try {
+                            return movieService.fetchMoviesByGenre(genreId)
+                                    .flatMap(movies -> openAIService.fetchMovieRecommendation(genreName, movies));
+                        } catch (URISyntaxException e) {
+                            throw new RuntimeException(e);
+                        }
                     });
         }
 
