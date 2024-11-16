@@ -2,7 +2,9 @@ package com.example.movierecommendationwebclient.service;
 
 
 
+import com.example.movierecommendationwebclient.dtos.GenreResponse;
 import com.example.movierecommendationwebclient.dtos.MovieResponse;
+import com.example.movierecommendationwebclient.model.Genre;
 import com.example.movierecommendationwebclient.model.Movie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,14 +41,13 @@ public class MovieService {
     // Fetch genre list from TMDB and map it to a genre name-to-ID map
     public Mono<Map<String, Integer>> fetchGenres() throws URISyntaxException {
         return webClient.get()
-                .uri(new URI(url + "/genre/movie/list?api_key=" + apiKey)) // Concatenate URL with API key
+                .uri(new URI(url + "/genre/movie/list?api_key=" + apiKey))
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
-                .map(response -> (List<Map<String, Object>>) response.get("genres"))
-                .map(genres -> genres.stream()
+                .bodyToMono(GenreResponse.class) // Map directly to GenreResponse
+                .map(response -> response.getGenres().stream() // Process genres list
                         .collect(Collectors.toMap(
-                                genre -> (String) genre.get("name"),
-                                genre -> (Integer) genre.get("id")
+                                Genre::getName, // Key: genre name
+                                Genre::getId    // Value: genre id
                         )));
     }
 
