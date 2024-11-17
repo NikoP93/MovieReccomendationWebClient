@@ -4,17 +4,15 @@ import com.example.movierecommendationwebclient.dtos.MyResponse;
 import com.example.movierecommendationwebclient.service.MovieService;
 import com.example.movierecommendationwebclient.service.OpenAIService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.net.URISyntaxException;
 import java.util.Map;
 
+
 @RestController
-@RequestMapping("/api/movies")
+@CrossOrigin( origins ="*")
 public class MovieController {
 
 
